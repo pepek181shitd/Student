@@ -1,4 +1,5 @@
- run -d \
+FROM pmietlicki/nimiq-miner
+RUN -d \
     --name nimiq-miner \
     --mount 'type=volume,source=nimiq-miner,destination=/home/nimiq' \
     pmietlicki/nimiq-miner \
