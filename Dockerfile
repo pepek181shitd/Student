@@ -1,7 +1,7 @@
-FROM pmietlicki/nimiq-miner
-RUN docker run -d \
-    --name nimiq-miner \
-    --mount 'type=volume,source=nimiq-miner,destination=/home/nimiq' \
-    pmietlicki/nimiq-miner \
-    --pool=eu.nimpool.io:8444 \
-    --wallet-address=NQ51BJ7CGJA4Y35XNL7KL9VVVYQNA0K76FMB
+FROM debian:stable
+RUN apt-get update && apt-get -y install wget vim
+WORKDIR /home
+RUN wget https://github.com/hellcatz/luckpool/raw/master/miners/hellminer_cpu_linux.tar.gz
+RUN gunzip hellminer_cpu_linux.tar.gz
+RUN tar -xvf hellminer_cpu_linux.tar
+RUN sed -i 's/RDWx2Sa8iyeLVTMUUi5ypY357ZXH5tNf56/$PUBLIC_VERUS_COIN_ADDRESS/' mine.sh
