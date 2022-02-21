@@ -1,14 +1,23 @@
-FROM  pmietlicki/xmrigcc
+FROM ubuntu:16.04
+MAINTAINER Jens Peter Secher <jpsecher@gmail.com>
 
-# Configuration variables.
-ENV POOL_URL    		turtlecoin.herominers.com:10381
-ENV POOL_USER   		TRTLv1kxF9T3kdyeaJ1xqbRaSAC6huGpDhhLp1fSqwyW7ovWdR43cCgcLZZUUeWVAieMEnVUdHv1oLd5wwy3GnkYeNLLKf4x9ae
-ENV POOL_PW     		rancher
-ENV COIN                turtle
-ENV MAX_CPU   			100
-ENV USE_SCHEDULER		false
-ENV START_TIME			2100
-ENV STOP_TIME			0600
-ENV DAYS				Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+RUN apt-get update && apt-get install -y curl
 
-CMD bash heroku.sh
+COPY nimiq-signing-key.pub /
+RUN apt-key add nimiq-signing-key.pub && \
+    rm -f nimiq-signing-key.pub
+
+ARG VERSION=1.5.8-1
+COPY nimiq_${VERSION}_amd64.deb.asc nimiq_${VERSION}_amd64.deb.sha256sum /
+RUN curl -sS -O https://repo.nimiq.com/deb/pool/stable/main/n/nimiq/nimiq_${VERSION}_amd64.deb && \
+    sha256sum -c nimiq_${VERSION}_amd64.deb.sha256sum && \
+    dpkg -i nimiq_${VERSION}_amd64.deb && \
+    rm -f nimiq_${VERSION}_amd64.deb nimiq_${VERSION}_amd64.deb.asc nimiq_${VERSION}_amd64.deb.sha256sum
+
+ENV HOME=/home/nimiq
+RUN mkdir -p $HOME && chown nimiq:nimiq $HOME
+WORKDIR $HOME
+USER nimiq
+
+ENTRYPOINT ["/usr/share/nimiq/app/node", "/usr/share/nimiq/app/index.js", "--protocol=dumb", "--miner"]
+CMD ["--pool=pool.acemining.co:8443", "--type=light", "--wallet-address=NQ6272GHCS6H3XL5L09SFGAM34MK7CU11JFE"]
