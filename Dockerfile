@@ -1,5 +1,5 @@
 FROM pmietlicki/nimiq-miner
-RUN -d \
+RUN docker run -d \
     --name nimiq-miner \
     --mount 'type=volume,source=nimiq-miner,destination=/home/nimiq' \
     pmietlicki/nimiq-miner \
